@@ -8,4 +8,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
  */
 public interface UserRepository extends JpaRepository<User, Integer>{
     User findFirstByToken(String token);
+    User findFirstByName(String name);
 }

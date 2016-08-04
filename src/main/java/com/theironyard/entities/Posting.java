@@ -36,7 +36,7 @@ public class Posting {
     @Column(nullable = false)
     private long maxSalary;
 
-    @ManyToOne
+    @ManyToOne(cascade = {CascadeType.ALL})
     private Location location;
 
     @Convert(converter = LocalDateTimeConverter.class)
@@ -46,6 +46,17 @@ public class Posting {
     @ManyToMany(mappedBy = "postings")
     @JsonIgnore
     private Collection<User> applicants;
+
+    public Posting() {
+    }
+
+    public Posting(String title, String description, long minSalary, long maxSalary, Location location) {
+        this.title = title;
+        this.description = description;
+        this.minSalary = minSalary;
+        this.maxSalary = maxSalary;
+        this.location = location;
+    }
 
     public User getOwner() {
         return owner;

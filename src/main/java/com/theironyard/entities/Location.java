@@ -19,6 +19,14 @@ public class Location {
     @Column(nullable = false)
     private String state;
 
+    public Location() {
+    }
+
+    public Location(String city, String state) {
+        this.city = city;
+        this.state = state;
+    }
+
     public String getCity() {
         return city;
     }

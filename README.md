@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/NR44/iron-jobs.svg?branch=master)](https://travis-ci.org/NR44/iron-jobs)
+
 #Iron Jobs
 
 ![futurama](futurama.jpg)

@@ -31,12 +31,12 @@ public class Posting {
     private String description;
 
     @Column(nullable = false)
-    private long minSalary;
+    private int minSalary;
 
     @Column(nullable = false)
-    private long maxSalary;
+    private int maxSalary;
 
-    @ManyToOne(cascade = {CascadeType.ALL})
+    @ManyToOne//(cascade = {CascadeType.ALL})
     private Location location;
 
     @Convert(converter = LocalDateTimeConverter.class)
@@ -50,7 +50,7 @@ public class Posting {
     public Posting() {
     }
 
-    public Posting(String title, String description, long minSalary, long maxSalary, Location location) {
+    public Posting(String title, String description, int minSalary, int maxSalary, Location location) {
         this.title = title;
         this.description = description;
         this.minSalary = minSalary;
@@ -86,7 +86,7 @@ public class Posting {
         return minSalary;
     }
 
-    public void setMinSalary(long minSalary) {
+    public void setMinSalary(int minSalary) {
         this.minSalary = minSalary;
     }
 
@@ -94,7 +94,7 @@ public class Posting {
         return maxSalary;
     }
 
-    public void setMaxSalary(long maxSalary) {
+    public void setMaxSalary(int maxSalary) {
         this.maxSalary = maxSalary;
     }
 
@@ -120,5 +120,9 @@ public class Posting {
 
     public LocalDateTime getCreated_at() {
         return created_at;
+    }
+
+    public void addApplicant(User user){
+        applicants.add(user);
     }
 }

@@ -133,4 +133,8 @@ public class User {
     public void setPostings(Collection<Posting> postings) {
         this.postings = postings;
     }
+
+    public void addPosting(Posting posting){
+        postings.add(posting);
+    }
 }

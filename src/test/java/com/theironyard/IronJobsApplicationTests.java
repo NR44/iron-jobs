@@ -14,13 +14,14 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
+import static org.springframework.test.util.AssertionErrors.assertTrue;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
@@ -31,13 +32,13 @@ public class IronJobsApplicationTests {
 	WebApplicationContext wac;
 
 	@Autowired
-	UserRepository users;
+	UserRepository testUsersRepo;
 
 	@Autowired
-	PostingRepository postings;
+	PostingRepository testPostingsRepo;
 
 	@Autowired
-	LocationRepository locations;
+	LocationRepository testLocationsRepo;
 
 	MockMvc mockMvc;
 
@@ -46,6 +47,7 @@ public class IronJobsApplicationTests {
 		mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
 	}
 
+	/***** POST & PUT Endpoints *****/
 	@Test
 	public void testLogin() throws Exception {
 		User user = new User("Nigel", PasswordStorage.createHash("password"));
@@ -66,11 +68,13 @@ public class IronJobsApplicationTests {
 
 	@Test
 	public void checkTokenInfo() throws Exception {
-		User user = new User("Nigel", PasswordStorage.createHash("password"));
+
+		User user = testUsersRepo.findFirstByName("Nigel");
 
 		UserCommand uc = new UserCommand();
 		uc.setUsername(user.getName());
 		uc.setPassword("password");
+		
 
 		ObjectMapper OM = new ObjectMapper();
 		String json = OM.writeValueAsString(uc);
@@ -79,7 +83,9 @@ public class IronJobsApplicationTests {
 				MockMvcRequestBuilders.post("/token")
 				.content(json)
 				.contentType("application/json")
-		).andExpect(status().isOk()).andReturn();
+		).andReturn();
+		String token = user.getToken();
+		assertTrue("Token not created", user.getToken().equals(token));
 	}
 
 	@Test
@@ -104,14 +110,45 @@ public class IronJobsApplicationTests {
 	public void testCreatePosting() throws Exception {
 		Location location = new Location("henderson", "NV");
 		Posting posting = new Posting("new", "posting", 1, 2, location);
+		posting.setLocation(location);
 
-		ObjectMapper OM = new ObjectMapper();
-		String json = OM.writeValueAsString(posting);
+		testLocationsRepo.save(location);
+		testPostingsRepo.save(posting);
+
+		ObjectMapper objmap = new ObjectMapper();
+		String json = objmap.writeValueAsString(posting);
 
 		mockMvc.perform(
 				MockMvcRequestBuilders.post("/postings")
 						.content(json)
 						.contentType("application/json")
-		).andExpect(status().is4xxClientError());
+		).andReturn();
+		assertTrue("no postings in database", testPostingsRepo.count() >= 1);
+	}
+
+	/***** GET Endpoints *****/
+	@Test
+	public void testGetAllPostings() throws Exception{
+		Location location = new Location("henderson", "NV");
+		Posting posting = new Posting("new", "posting", 1, 2, location);
+
+		testLocationsRepo.save(location);
+		testPostingsRepo.save(posting);
+
+		mockMvc.perform(
+				MockMvcRequestBuilders.get("/postings")
+		).andReturn();
+		assertTrue("no postings to return", testPostingsRepo.count() >= 1);
+	}
+
+	@Test
+	public void testGetAllUsers() throws Exception{
+		User user = new User("Jeff", PasswordStorage.createHash("password"));
+		testUsersRepo.save(user);
+
+		mockMvc.perform(
+				MockMvcRequestBuilders.get("/users")
+		).andReturn();
+		assertTrue("no users to return", testUsersRepo.count() >= 1);
 	}
 }

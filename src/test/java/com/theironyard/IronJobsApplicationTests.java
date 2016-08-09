@@ -74,7 +74,7 @@ public class IronJobsApplicationTests {
 		UserCommand uc = new UserCommand();
 		uc.setUsername(user.getName());
 		uc.setPassword("password");
-		
+
 
 		ObjectMapper OM = new ObjectMapper();
 		String json = OM.writeValueAsString(uc);
